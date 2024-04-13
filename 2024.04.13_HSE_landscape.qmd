@@ -1,8 +1,8 @@
 ---
 title: "Построение ландшафта области знаний"
-subtitle: "для курса ['Количественные методы в гуманитарных науках: критическое введение'](http://criticaldh.ru/) (2024, НИУ ВШЭ)"
+subtitle: "для курса ['Количественные методы в гуманитарных науках: критическое введение'](http://criticaldh.ru/) (2024, НИУ ВШЭ)\n\ntinyurl.com/2ydndkzg"
 author: 
-  - name: "Г. А. Мороз (Международная лаборатория языковой конвергенции)"
+  - name: "Г. А. Мороз\n\nМеждународная лаборатория языковой конвергенции"
 date: "04/13/2024"
 date-format: "D.MM.YYYY"
 format: 
@@ -30,6 +30,7 @@ editor_options:
 #| include: false
 library(tidyverse)
 theme_set(theme_minimal()+theme(text = element_text(size = 16), legend.position = "bottom"))
+library(kableExtra)
 ```
 
 ##
@@ -222,15 +223,351 @@ knitr::include_graphics("images/12_cube_1.jpeg")
 - Эмбеддинги --- многомерные вектора чисел, например, в GPT-3 50 тысяч токенов закодировано при помощи векторов длинной 12 тысяч. Смотреть на это пространство глазами нельзя, но можно попробовать уменьшить размерность.
 
 - Популярные алгоритмы:
-    - Singular value decomposition (SVD)
     - Principal Component Analysis (PCA)
     - Multidimensional Scaling (MDS)
+    - Linear discriminant analysis (LDA)
     - Uniform Manifold Approximation and Projection (UMAP)
     - t-distributed Stochastic Neighbor Embedding (t-SNE)
 
+## Кластеризация
+
+- Полученные группы в пространстве часто можно выделить автоматически. Для этого используют методы кластеризации, чаще всего Hierarchical Density-based spatial clustering of applications with noise (HDBSCAN) [@ester1996; @campello13]
+
+
 # Исследование лингвистики
 
+##  Команда
+
+- руководитель
+    - Г. Мороз
+- студенты
+    - А. Агроскина (б)
+    - Т. Дедов (б)
+    - А. Орехов (м)    
+    - К. Сидоров (м)
+    - А. Степанова (б)
+
+##  План исследования
+
+- выбрать список журналов для анализа
+- извлечь аннотации для всех работ из выбранных журналов
+- использовать векторизатор и метод уменьшения размерностей для преобразования пространства аннотаций в 2D
+- исследовать, насколько релевантно для лингвистики получившееся пространство 
+- выявить и исследовать возможные междисциплинарные стыки
+
+## Списки журналов
+
+Мы использовали несколько источников журналов
+
+- Тэг `филология, лингвистика, медиакоммуникации` в вышкинском списке журналов
+
+```{r}
+#| out-width: 70%
+#| fig-align: center
+
+knitr::include_graphics("images/14_hse_journal_list.png")
+```
+
+- Тэг `6162 Languages` в списке журналов из ресурса [Finish Publication Forum](https://www.tsv.fi/julkaisufoorumi/haku.php)
+
+```{r}
+#| out-width: 45%
+#| fig-align: center
+#| 
+knitr::include_graphics("images/15_helsenki.png")
+```
+
+## Списки журналов
+
+```{r}
+#| include: false
+journals <- read_csv("/home/agricolamz/work/bureaucracy/linguistic_convergency/journals/abcd_list_annotated.csv")
+```
+
+После соединения списков журналов мы по своему усмотрению разметили их по некоторым категориям (теги: `linguistics` (`r journals |> filter(linguistics == "linguistics") |> nrow()`), `interdisciplinary` (`r journals |> filter(linguistics == "interdisciplinary") |> nrow()`), `language_learning` (`r journals |> filter(linguistics == "language_learning") |> nrow()`) и другие).
+
+```{r}
+journals |> 
+  filter(linguistics == "linguistics") |>
+  count(hse_level, helsenki_level)  |> 
+  na.omit() |> 
+  pivot_wider(names_from = helsenki_level, values_from = n, values_fill = 0)  |> 
+  rename(`HSE level` = hse_level) |> 
+  kable() |> 
+  add_header_above(c(" " = 1, "Helsenki level" = 3)) |> 
+  kable_styling(position = "center")
+```
+
+\pause
+
+Разметка "лингвистичности" журналов --- огромная и слабо автоматизируемая работа, которая требует экспертизы в самых разных областях лингвистики.
+
+## Сбор аннотаций лингвистических исследований
+
+>- Мы планировали написать краулер, который бы собирал статьи из желаемых журналов...
+>- но мы обнаружили базу данных `Crossref` и соответствующий пакет для R `rcrossref` [@chamberlain22]...
+>- а потом мы обнаружили базу данных `OpenAlex` и соответствующий пакет для R `openalexR` [@aria23]
+
+## Чистка аннотаций
+
+>- заметки редактора
+>- некрологи и поздравления
+>- описания конференций
+>- списки содержания книг
+>- списки содержания выпусков журнала
+>- аннотации отмененных (retracted) статей 
+>- аннотации на отличном от английского языках
+>- аннотации на нескольких языках
+>- сообщения об отсутствии аннотации
+>- acknowledgments вместо аннотации
+>- библиографическое описание книги (в случаях рецензии)
+>- начало статьи вместо аннотации (характерно для старых статей)
+>- ошибки распознавания
+>- слишком короткие/длинные аннотации
+
+## Примеры проблемных аннотаций
+
+```{r}
+#| out-width: 100%
+
+knitr::include_graphics("images/16_russian_linguistics.png")
+```
+
+## Примеры проблемных аннотаций
+
+```{r}
+#| out-width: 100%
+
+knitr::include_graphics("images/17_american_speech.png")
+```
+
+<https://doi.org/10.2307/486818>
+
+```{r}
+just_linguistics <- read_csv("/home/agricolamz/work/bureaucracy/linguistic_convergency/journals/umap/2024-04-13_jl.csv")
+
+just_linguistics |> 
+  nrow() ->
+  n_linguistic_abstracts
+```
+
+## Структура данных: `r n_linguistic_abstracts` строчек, `r ncol(just_linguistics)` колонок
+
+- `id`: https://openalex.org/W3040611730
+- `doi`: https://doi.org/10.1075/fol.18056.dob
+- `author`: Nina Dobrushina 
+- `title`: Negation in complement clauses of fear-verbs 
+- `publication_year`: 2021
+- `journal`: Functions of Language
+- `issn_l`: 0929-998X
+- `first_page`: 121
+- `last_page`: 152 
+- `volume`: 28 
+- `issue`: 2
+- `is_retracted`: FALSE
+- `cited_by_count`: 1
+- `abstract`: \tiny Complement clauses of verbs of fear often contain expletive negation, which is negative marking without negative meaning. <...> \normalsize
+- `concepts`: \tiny Negation; Complement (music); Linguistics; Verb; Meaning (existential); Psychology; Mathematics; Computer science; Philosophy; Biochemistry; Chemistry; Complementation; Psychotherapist; Gene; Phenotype \normalsize
+- `retrieved`: 30-04-2023
+
+## Векторное представление слов
+
+- Мы использовали векторизатор `doc2vec` [@le14; @wijffels21] (смотрели GloVe [@pennington14], BERT [@devlin18] и RoBERTa [@liu19])
+- Полученное 50-мерное пространство мы сократили до 2D при помощи UMAP  [@mcinnes18]
+
+## Ландшафт лингвистических исследований
+
+```{r, out.width='100%'}
+just_linguistics  |> 
+  ggplot(aes(umap_v1, umap_v2))+
+  geom_point(size = 0.1, alpha = 0.2)+
+  theme_void()
+```
+
+## Аннотации журналов, в названиях которых содержится *phon*  
+
+```{r, out.width='95%'}
+just_linguistics |> 
+  filter(str_detect(journal_issn, "PHON")) |>
+  ggplot(aes(umap_v1, umap_v2))+
+  geom_point(size = 0.1, alpha = 0.2, color = "grey80",
+             data = just_linguistics) +  
+  geom_point(size = 0.2, alpha = 0.5) +
+  theme_void()
+
+just_linguistics |> 
+  filter(str_detect(journal_issn, "PHON")) |> 
+  distinct(journal_issn) |> 
+  pull(journal_issn) ->
+  journals
+```
+
+\tiny `r journals`
+
+## Аннотации журналов, в названиях которых содержится *psych*  
+
+```{r, out.width='95%'}
+just_linguistics |> 
+  filter(str_detect(journal_issn, "PSYCH")) |>
+  ggplot(aes(umap_v1, umap_v2))+
+  geom_point(size = 0.1, alpha = 0.2, color = "grey80",
+             data = just_linguistics) +  
+  geom_point(size = 0.2, alpha = 0.5) +
+  theme_void()
+
+just_linguistics |> 
+  filter(str_detect(journal_issn, "PSYCH")) |> 
+  distinct(journal_issn) |> 
+  pull(journal_issn) ->
+  journals
+```
+
+\tiny `r journals`
+
+## Наша полуавтоматическая разметка аннотаций   
+
+```{r, out.width='100%'}
+abstract_annotation <- read_csv("/home/agricolamz/work/bureaucracy/linguistic_convergency/journals/first_results/annotated.csv")
+
+just_linguistics |>
+  left_join(abstract_annotation) |> 
+  group_by(type) |> 
+  summarize(umap_v1_mean = mean(umap_v1),
+            umap_v2_mean = mean(umap_v2)) ->
+  labels
+
+just_linguistics |> 
+  left_join(abstract_annotation) |> 
+  filter(!is.na(type)) |> 
+  ggplot(aes(umap_v1, umap_v2, color = type))+
+  geom_point(size = 0.1, alpha = 0.2, color = "grey80",
+             data = just_linguistics) +  
+  geom_point(size = 0.2, alpha = 0.5) +
+  geom_label(aes(umap_v1_mean, umap_v2_mean, label = type), data = labels, color = "black", alpha = 0.5)+
+  theme_void()+
+  theme(legend.position = "none")
+```
+
+## А что если добавить других дисциплин?
+
+```{r}
+database <- read_csv("/home/agricolamz/work/bureaucracy/linguistic_convergency/journals/umap/2023-11-29.csv")
+database |> 
+  filter(field != "linguistics") |> 
+  count(field, journal) |> 
+  kable() |> 
+  kable_styling(font_size = 4)
+```
+
+## А что если добавить других дисциплин?
+
+```{r, out.width='100%'}
+database |>
+  group_by(field) |> 
+  summarize(umap_v1_mean = mean(umap_v1),
+            umap_v2_mean = mean(umap_v2)) ->
+  labels
+
+database |>
+  ggplot(aes(umap_v1, umap_v2, color = field))+
+  geom_point(size = 0.1, alpha = 0.2) +
+  geom_label(aes(umap_v1_mean, umap_v2_mean, label = field), data = labels, color = "black")+
+  theme_void()+
+  theme(legend.position = "none")
+```
+
 # Ограничения метода
+
+## Ограничения метода:
+
+- количество текстов должно быть большое
+    - мы безуспешно пробовали процедуру на уровне отдельных российских журналов 
+- нужно понимать контекст текстов
+
+```{r}
+#| include: false
+#| cache: true
+
+scotus::scotus_sample |> 
+  mutate(text = str_replace_all(text, "\n", " "),
+         nchar = nchar(text),
+         text = str_remove_all(text, "'"),
+         text = str_remove_all(text, "`"),
+         spaces = str_count(text, "\\s")) |> 
+  filter(spaces < 950,
+         nchar > 300) ->
+  scotus_sample
+
+library(doc2vec)
+scotus_sample |> 
+  mutate(doc_id = 1:n()) |>
+  select(doc_id, text) |> 
+  paragraph2vec(threads = 15) ->
+  model
+
+library(uwot)
+as.matrix(model, which = "docs") |>
+  umap(metric = "cosine", init = "pca") |> 
+  as_tibble() |> 
+  bind_cols(scotus_sample)  -> 
+  scotus_merged
+
+scotus_merged |> 
+  mutate(cluster = kmeans(scotus_merged[,1:2], centers = 2)$cluster,
+         cluster = as.factor(cluster)) ->
+  scotus_merged
+```
+
+
+## Ограничения метода: `r nrow(scotus_merged)` мнений верховного суда США
+
+```{r}
+scotus_merged |> 
+  ggplot(aes(V1, V2, color = cluster))+
+  geom_point() 
+```
+
+## Ограничения метода: `r nrow(scotus_merged)` мнений верховного суда США
+
+```{r}
+scotus_merged |> 
+  count(year, cluster) |> 
+  ggplot(aes(as.double(year), n, fill = cluster))+
+  geom_col()+
+  labs(x = NULL)
+```
+
+## Ограничения метода: `r nrow(scotus_merged)` мнений верховного суда США
+
+```{r}
+library(tidytext)
+scotus_merged |> 
+  unnest_tokens(input = "text", output = "bigram", token = "ngrams", n = 2) |> 
+  separate(bigram, into = c("word_1", "word_2"), sep = " ") |> 
+  anti_join(stop_words, by = c("word_1" = "word")) |>
+  anti_join(stop_words, by = c("word_2" = "word")) |> 
+  mutate(bigram = str_c(word_1, " ", word_2)) |> 
+  count(cluster, bigram, sort = TRUE) |> 
+  group_by(cluster) |> 
+  slice(1:20) |> 
+  mutate(bigram = reorder_within(bigram, by = n, within = cluster)) |> 
+  ggplot(aes(n, bigram))+
+  geom_col()+
+  facet_wrap(~cluster, scales = "free")+
+  scale_y_reordered()
+```
+
+## Ограничения метода: `r nrow(scotus_merged)` мнений верховного суда США (1)
+
+\tiny
+
+No. 769. See 353 U.S. 989, 77 S.Ct. 1281. Mr. Thomas D. McBride, Atty. Gen. of Pennsylvania, and Lois G. Forer, Deputy Atty. Gen., Philadelphia, for Commonwealth of Pennsylvania. Messrs. Abraham L. Freedman and David Berger, Philadelphia, for City of Philadelphia and others. Messrs. William T. Coleman, Jr., Raymond Pace Alexander, Philadelphia, and Louis Pollak, for appellants Foust and others. Mr. Owen B. Rhoads, Philadelphia, for appellee. PER CURIAM. The motion to dismiss the appeal for want of jurisdiction is granted. 28 U.S.C. § 1257(2), 28 U.S.C.A. § 1257(2). Treating the papers whereon the appeal was taken as a petition for writ of certiorari, 28 U.S.C. § 2103, 28 U.S.C.A. § 2103, the petition is granted. 28 U.S.C. § 1257(3), 28 U.S.C.A. § 1257(3). Stephen Girard, by a will probated in 1831, left a fund in trust for the erection, maintenance, and operation of a college. The will provided that the college was to admit as many poor white male orphans, between the ages of six and ten years, as the said income shall be adequate to maintain. The will named as trustee the City of Philadelphia. The provisions of the will were carried out by the State and City and the college was opened in 1848. Since 1869, by virtue of an act of the Pennsylvania Legislature, the trust has been administered and the college operated by the Board of Directors of City Trusts of the City of Philadelphia. Pa.Laws 1869, No. 1258, p. 1276; Purdons Pa.Stat.Ann., 1957, Tit. 53, § 16365. In February 1954, the petitioners Foust and Felder applied for admission to the college. They met all qualifications except that they were Negroes. For this reason the Board refused to admit them. They petitioned the Orphans Court of Philadelphia County for an order directing the Board to admit them, alleging that their exclusion because of race violated the Fourteenth Amendment to the Constitution. The State of Pennsylvania and the City of Philadelphia joined in the suit also contending the Boards action violated the Fourteenth Amendment. The Orphans Court rejected the constitutional contention and refused to order the applicants admission. In re Girards Estate, 4 Pa.Dist. & Co.R.2d 671 (Orph.Ct.Philadelphia). This was affirmed by the Pennsylvania Supreme Court. 386 Pa. 548, 127 A.2d 287. The Board which operates Girard College is an agency of the State of Pennsylvania. Therefore, even though the Board was acting as a trustee, its refusal to admit Foust and Felder to the college because they were Negroes was discrimination by the State. Such discrimination is forbidden by the Fourteenth Amendment. Brown v. Board of Education, 347 U.S. 483, 74 S.Ct. 686, 98 L.Ed. 873. Accordingly, the judgment of the Supreme Court of Pennsylvania is reversed and the cause is remanded for further proceedings not inconsistent with this opinion. Reversed and remanded with directions.
+
+## Ограничения метода: `r nrow(scotus_merged)` мнений верховного суда США (2)
+
+\tiny
+
+No. 330. Mr. Nash Rockwood, of New York City, for appellants. Mr. John Caldwell Myers, Asst. Dist. Atty., of New York City, for appellees. Mr. Chief Justice TAFT delivered the opinion of the Court. This appeal is from an order of the District Court for the Southern District of New York discharging a rule nisi and refusing an injunction. On January 14th a petition in involuntary bankruptcy was filed against Elmore D. Dier and others, partners, as E. D. Dier & Co. Two days after the filing of the petition, Mandred Ehrich was appointed receiver of the estate of the alleged bankrupts, and they and their servants were directed to turn over all their property, assets, account books and records, and were restrained from suing out of any other court any process to impound or take possession of them. This order was complied with and the receiver took possession of the books and papers of the alleged bankrupts and of the firm. On February 16th, Dier informed the court that the district attorne  of New York City had applied to the receiver for the production of these books and papers before the grand jury, and asked for the rule nisi against the receiver and the district attorney, and upon a hearing thereof an injunction to prevent the use of such books and papers against him before the grand jury, on the ground that they would incriminate him and that his right to refuse to testify against himself under the Fourth and Fifth Amendments would thus be violated by the process of the federal District Court. Judge Learned Hand, sitting in bankruptcy, discharged the rule and refused to enjoin the proposed use of the books. Judge Hands action was based on the ruling of this court in Johnson v. United States, 228 U. S. 457, 33 Sup. Ct. 572, 57 L. Ed. 919, 47 L. R. A. (N. S.) 263. He quoted the language used in the Johnson Case: A party is privileged from producing the evidence, but not      from its production. He alluded to the circumstance that in the Johnson Case there were both title and possession in the trustee, whereas in this case the books and papers were in the hands of the receiver, who has no title; but that, he said, made no difference. We agree with this view, and hold that the right of the alleged bankrupt to protest against the use of his books and papers relating to his business as evidence against him ceases as soon as his possession and control over them pass from him by the order directing their delivery into the hands of the receiver and into the custody of the court. This change of possession and control is for the purpose of properly carrying on the investigation into the affairs of the alleged bankrupt and the preservation of his assets pending such investigation, the adjudication of bankruptcy vel non, and, if bankruptcy is adjudged, the proper distribution of the estate. It may be that the allegation of bankruptcy will not be sustained, and in that case the alleged bankrupt will be entitled to a return of his property, including his books and papers, and, when they are returned, he may refuse to produce them and stand on his constitutional rights. But while they are, in the due course of the bankruptcy proceedings, taken out of his possession and control, his immunity from producing them, secured him under the Fourth and Fifth Amendments, does not inure to his protection. He has lost any right to object to their use as evidence because, not for purpose of evidence, but in the due investigation of his alleged bankruptcy and the preservation of his estate pending such investigation, the control and possession of his books and papers relating to his business were lawfully taken from him. It is pressed upon us that the bankrupt may prevent the use of such books and papers taken over by a receiver in the bankruptcy proceedings for evidence in a criminal case in the state court by resisting surrender and protesting against their use for such a purpose at the time the receiver took possession. But we think the alleged bankrupt has no such right. We so held in Matter of Fuller, 262 U. S. 91, 43 Sup. Ct. 496, 67 L. Ed. ——, decided April 30, 1923, in which it was sought to attach conditions of this kind to the turning over of the books and papers of a bankrupt to the trustee in bankruptcy. We are of opinion that the same principle must apply to the delivery of the books and papers relating to the bankrupts business and property included in the estate into the custody of the receiver of the bankruptcy court. Of course, where such books and papers are in the custody of the bankruptcy court, they cannot be taken therefrom by subpoena of a state court, except upon consent of the federal court. In granting or withholding that consent, the latter exercises a judicial discretion dependent on the circumstances, and having due regard to the comity which should be observed toward state courts exercising jurisdiction within the same territory. Ponzi v. Fessenden, 258 U. S. 254, 259, 42 Sup. Ct. 309, 66 L. Ed. 607, 22 A. L. R. 879. All we hold here is that, the court below having exercised discretion to allow the use of the books and papers in the custody of its officer upon subpoena by another court, the alleged bankrupts rights under the Fourth and Fifth Amendments have not been violated. Order affirmed.
 
 ##
 
