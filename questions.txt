@@ -1,0 +1,10 @@
+1. Верефикация у специалистов.
+2. Как авторы аннотировали атлас? Применимо ли это к гуманитарным журналам?
+
+To annotate our atlas, we chose a set of 38 labels covering basic life science fields such as ‘virology’ and ‘bio-chemistry’, and medical specialties such as ‘radiology’ and
+‘ophthalmology’. We assigned each label to the papers published in journals with the corresponding word in journal titles. For example, all papers published in Annals of
+Surgery were labeled ‘surgery’.
+
+3. Бывают так называемые фабрики статей. Как методология авторов позволяет их вычленять?
+
+4. Что вы думаете про изменение картины во времени? Можно ли это исследовать?
