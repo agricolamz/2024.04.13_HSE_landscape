@@ -1,0 +1,243 @@
+---
+title: "Построение ландшафта области знаний"
+subtitle: "для курса ['Количественные методы в гуманитарных науках: критическое введение'](http://criticaldh.ru/) (2024, НИУ ВШЭ)"
+author: 
+  - name: "Г. А. Мороз (Международная лаборатория языковой конвергенции)"
+date: "04/13/2024"
+date-format: "D.MM.YYYY"
+format: 
+  beamer:
+    theme: Singapore
+    mainfont: Brill
+    monofont: Iosevka
+    df-print: kable
+    pdf-engine: xelatex
+    cite-method: natbib
+    classoption: t
+    header-includes: |
+       \setbeamertemplate{footline}[page number]
+urlcolor: teal
+citecolor: teal
+echo: false
+fig-align: center
+bibliography: bibliography.bib
+csl: apa.csl
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| include: false
+library(tidyverse)
+theme_set(theme_minimal()+theme(text = element_text(size = 16), legend.position = "bottom"))
+```
+
+##
+
+\centering
+
+*Как все люди Библиотеки, в юности я путешествовал. Это было паломничество в поисках книги, возможно каталога каталогов...*
+
+Х. Л. Борхес, "Вавилонская библиотека"
+
+
+# "Информационный гриб"
+
+## 
+
+- Данные вокруг гуманитария?
+- Данные вокруг гуманитария...
+- Данные вокруг гуманитария!
+- Данные вокруг гуманитария: \pause 
+Можем быть мы можем попробовать хотя бы обозреть эти самые данные с высоты птичьего полета?
+
+## Научных публикаций очень много: желаемое
+
+```{r}
+#| out-height: 25%
+#| fig-align: center
+knitr::include_graphics("images/01_standing_on_the_shoulders_of_giants.png")
+```
+
+\pause
+
+- "*...Мы подобны карликам, усевшимся на плечах великанов; мы видим больше и дальше, чем они, не потому, что обладаем лучшим зрением, и не потому, что выше их, но потому, что они нас подняли и увеличили наш рост собственным величием*" высказываение приписывают Бернару Шартрскому, французскому философу XI-XII 
+
+\pause
+
+- "*Today we are privileged to sit side-by-side with the giants on whose shoulders we stand.*" Gerald Holton, "On the recent past of physics," American Journal of Physics, 29 (December, 1961), 805.
+
+## Научных публикаций очень много: желаемое
+
+```{r}
+#| out-width: 99%
+#| fig-align: center
+knitr::include_graphics("images/02_weinberg_01.png")
+```
+
+## Научных публикаций очень много: желаемое
+
+```{r}
+#| out-width: 99%
+#| fig-align: center
+knitr::include_graphics("images/03_weinberg_02.png")
+```
+
+## Научных публикаций очень много: реальность
+
+- Динамика сохраняется: [@price1963; @bornmann2015] 
+- Очень сложно разобраться в какой-либо области знания \pause
+- Количество цитирований (или другие библиометрические меры) могли бы помочь, но ...
+    - ... люди все чаще цитируют, не читая и эра больших языковых моделей скорее всего увеличит этот эффект \pause
+    - ... люди могут хакнуть и обессмыслить любую метрику \pause
+- Исследователи больше любят новые исследования: на материале 726 медицинских статей, содержащих 17 895 научных ссылок, авторы приходят к выводу, что вне зависимости от журнала более 70% цитируемых работ опубликованы не более 10 лет до публикации работы. [@chow23] \pause
+- Даже цифра может подгнить: авторы обнаружили значительную долю "мертвых" URL статей, которые упоминаются при цитировании в публикациях в медицине. [@klein14]
+
+# Ландашфты
+
+## [Карта репозиториев гитхаба](https://anvaka.github.io/map-of-github/) (Андрей Кашча)
+
+```{r}
+#| fig-align: "center"
+#| out-width: 75%
+knitr::include_graphics("images/04_github_1.png")
+```
+
+<https://anvaka.github.io/map-of-github/>
+
+## [Карта репозиториев гитхаба](https://anvaka.github.io/map-of-github/) (Андрей Кашча)
+
+```{r}
+#| fig-align: "center"
+#| out-width: 78%
+
+knitr::include_graphics("images/05_github_2.png")
+```
+
+##  [@gonzalez23] 
+
+*The number of publications in biomedicine and life sciences has rapidly grown over the last decades, with over 1.5 million papers now published every year. This makes it difficult to keep track of new scientific works and to have an overview of the evolution of the field as a whole. Here we present a 2D atlas of the entire corpus of biomedical literature, and argue that it provides a unique and useful overview of the life sciences research. <...>*
+
+<https://static.nomic.ai/pubmed.html> (интерактивная версия)
+
+**Это препринт!**
+
+##  [@gonzalez23]
+
+```{r}
+#| fig-align: "center"
+#| out-width: 63%
+
+knitr::include_graphics("images/06_landscape.png")
+```
+
+2D эмбеддинги на основе 21 миллиона аннотаций, которые были траснформированы в 768-мерное векторное пространство при помощи PubMedBERT [@gu21], а дальше сплюснутая в 2D при помощи t-SNE [@maaten08]. Цвета основаны на названиях журналов.
+
+##  [@gonzalez23]
+
+```{r}
+#| layout-ncol: 2
+#| out-width: 95%
+
+knitr::include_graphics("images/07_landscape_by_year.png")
+knitr::include_graphics("images/08_covid.png")
+```
+
+Регион карты, посвященный Covid-19. Цвета приписаны на основе названий работ. Кроме того здесь есть около 15% работ не посвященных короновирусу.
+
+##  [@gonzalez23]
+
+```{r}
+#| layout-ncol: 2
+#| out-width: 93%
+
+knitr::include_graphics("images/09_landscape_by_gender.png")
+knitr::include_graphics("images/10_education_surgery.png")
+```
+
+Статьи раскрашены по полу первого автора.
+
+## Другие проекты Nomic
+
+- [map of Wikipedia](https://atlas.nomic.ai/map/wikipedia)
+- [map of Twitter](https://atlas.nomic.ai/map/twitter)
+- другие https://atlas.nomic.ai/discover
+
+# Похожее
+
+## Библиометрические исследования?
+
+Библиометрия --- дисциплина, возникшая в конце XIX века, в рамках которой можно встретить разные применения математических методов к исследованию научных работ. Наиболее известные применения:
+
+- графы соавторства
+- библиографические ссылки 
+- ключевые слова
+- измерение качества журналов
+- и др.
+
+## Distant Reading? 
+
+Дальнее чтение [@moretti13] --- это не какой-то один метод, а целое семейство методов анализа литературных текстов и их структуры, а также подразумевающий некоторый осмысленный с точки зрения литературоведения исследовательский вопрос.
+
+# Техническое
+
+## Эмбеддинги
+
+- Архитектурам машинного обучения любой сложности при работе с языковыми данными нужно уметь преобразовывать слова (на самом деле некоторые кусочки письменных слов) в наборы чисел, которые обычно называют **вектором**.
+- Числа для вектора каждого конкретного слова обычно получают на основе контекстов, в которых оно появляется в обучающем корпусе.
+- Слова с похожим значением будут направлены в одну сторону. Сравнивать их следует по углу между векторами.
+- В работах [@mikolov13a; @mikolov13b] от Google была представлена модель `word2vec`, архитектура нейросети для создания векторных моделей.
+- Совсем недавно вышли видео 3Blue1Brown, в которых это обсуждается подробнее:
+    - [But what is a GPT? Visual intro to transformers](https://www.youtube.com/watch?v=wjZofJX0v4M)
+    - [Attention in transformers, visually explained](https://www.youtube.com/watch?v=eMlx5fFNoYc)
+
+## Эмбеддинги
+
+```{r}
+#| out-width: 108%
+knitr::include_graphics("images/11_emb_1.png")
+```
+
+Взято из видео 3Blue1Brown.
+
+## doc2vec
+
+- Чтобы анализировать тексты [@le14] предложили разбивать их на абзацы и конкатенировать векторы, которые входят в абзац, а потом использовать их для кластеризации текстов.
+- Если применять эту логику к предложениям, то это позволяет не терять информацию о месте слова.
+
+## Уменьшение размерности
+
+- Эмбеддинги --- многомерные вектора чисел, например, в GPT-3 50 тысяч токенов закодировано при помощи векторов длинной 12 тысяч. Смотреть на это пространство глазами нельзя, но можно попробовать уменьшить размерность.
+
+```{r}
+#| layout-ncol: 2
+#| out-width: 96%
+
+knitr::include_graphics("images/13_cube_2.jpg")
+knitr::include_graphics("images/12_cube_1.jpeg")
+```
+
+## Уменьшение размерности
+
+- Эмбеддинги --- многомерные вектора чисел, например, в GPT-3 50 тысяч токенов закодировано при помощи векторов длинной 12 тысяч. Смотреть на это пространство глазами нельзя, но можно попробовать уменьшить размерность.
+
+- Популярные алгоритмы:
+    - Singular value decomposition (SVD)
+    - Principal Component Analysis (PCA)
+    - Multidimensional Scaling (MDS)
+    - Uniform Manifold Approximation and Projection (UMAP)
+    - t-distributed Stochastic Neighbor Embedding (t-SNE)
+
+# Исследование лингвистики
+
+# Ограничения метода
+
+##
+
+\centering
+
+*Мне известен дикий край, где библиотекари отказались от суеверной и напрасной привычки искать в книгах смысл, считая, что это все равно что искать его в снах или в беспорядочных линиях руки...*
+
+Х. Л. Борхес, "Вавилонская библиотека"
+
+# Список литературы
